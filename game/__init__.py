@@ -17,7 +17,7 @@ def main():
     # Initialize display
     win_size = Vector2(1000, 750)
     win = pygame.display.set_mode(win_size)
-    pygame.display.set_caption("Tube Game")
+    pygame.display.set_caption("The Boring Game")
 
     # Initialize clock
     fps = 60
