@@ -3,7 +3,7 @@ from pathlib import Path
 import pygame
 from pygame.sprite import Sprite, Group
 from pygame import BLEND_ALPHA_SDL2, Vector2
-from pygame.transform import rotate
+from pygame.transform import rotate, scale_by
 
 CAR_SPRITE_PATH = Path(__file__).parent / "assets" / "car" / "car.png"
 CAR_SPEED_DAMPING = 0.02
@@ -15,7 +15,7 @@ class Car(Sprite):
     def __init__(self, *groups: Group) -> None:
         super().__init__(*groups)
 
-        self.image = pygame.image.load(CAR_SPRITE_PATH)  # type: ignore
+        self.image = scale_by(pygame.image.load(CAR_SPRITE_PATH), 2)  # type: ignore
         self.rect = pygame.FRect(self.image.get_rect())  # type: ignore
 
         self.angle: float = 0
@@ -24,9 +24,14 @@ class Car(Sprite):
         # Got this result using some basic algebra
         self.max_speed = CAR_ACCELERATION * (1 / CAR_SPEED_DAMPING - 1)
 
-    def update(self, dt: float):  # type: ignore
+    def update(self, dt: float, camera_speed: float):  # type: ignore
+        # Calculate linear velocities from speed and angle
         velocity = Vector2()
         velocity.from_polar((self.speed, -self.angle))
+
+        # Account for camera speed
+        velocity.y += camera_speed
+
         self.rect = self.rect.move(velocity * dt)  # type: ignore
         self.speed *= 1 - CAR_SPEED_DAMPING
 
