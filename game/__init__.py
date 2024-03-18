@@ -1,7 +1,8 @@
 from pathlib import Path
+from random import randint
 
 import pygame
-from pygame import Vector2
+from pygame import BLEND_ALPHA_SDL2, Vector2
 from pygame.freetype import Font
 from pygame.sprite import Group
 
@@ -34,6 +35,7 @@ def main():
     # Initialize game objects
 
     camera_speed: float = 15
+    yt_views: float = 0
 
     car = Car()
     car.rect.centerx = win_size.x / 2  # type: ignore
@@ -50,6 +52,10 @@ def main():
     road2.rect.centerx = win_size.x / 2  # type: ignore
     road2.rect.bottom = road1.rect.top  # type: ignore
 
+    # Game events
+    view_gain_event = pygame.USEREVENT + 1
+    pygame.time.set_timer(view_gain_event, 15 * 1000)  # 15s interval
+
     while True:
         dt = clock.tick(fps) / 1000
         keys = pygame.key.get_pressed()
@@ -58,6 +64,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            elif event.type == view_gain_event:
+                view_increase = randint(2, 5) * camera_speed * 0.02
+                yt_views += view_increase
 
         # Car acceleration
         if keys[pygame.K_w]:
@@ -72,18 +81,24 @@ def main():
         # Camera motion
         # Camera never move faster than the car's maximum speed
         camera_speed = min(
-            camera_speed + CAMERA_ACCELERATION * dt, car.max_speed * 0.92
+            camera_speed + CAMERA_ACCELERATION * dt, car.max_speed * 0.9
         )
 
         # Update
         car.update(dt, camera_speed)
         roads.update(dt, camera_speed)
 
-        # Move roads to give the illusion of inifinite road
+        # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore
             road1.rect.bottom = road2.rect.top  # type: ignore
         if road2.rect.top > win_size.y:  # type: ignore
             road2.rect.bottom = road1.rect.top  # type: ignore
+
+        # Decrease views if car goes offscreen or off road
+        if not win.get_rect().contains(car.rect) or not (  # type: ignore
+            road1.rect.left <= car.rect.centerx <= road1.rect.right  # type: ignore
+        ):
+            yt_views -= 8 * dt  # 8 views per second lost
 
         # NOTE: Draw Start
         win.fill((50, 50, 100))
@@ -93,15 +108,12 @@ def main():
 
         car.draw(win)
 
-        ## text, text_rect = font.render("Hello, World!", "white", size=46)
-        ## win.blit(
-        ##     text,
-        ##     (
-        ##         (win_size.x - text_rect.width) / 2,
-        ##         (win_size.y - text_rect.height) / 2,
-        ##     ),
-        ##     special_flags=BLEND_ALPHA_SDL2,
-        ## )
+        view_text, _ = font.render(f"{int(yt_views)} views", "white", size=24)
+        win.blit(
+            view_text,
+            (5, 5),
+            special_flags=BLEND_ALPHA_SDL2,
+        )
 
         pygame.display.flip()
         # NOTE: Draw End
