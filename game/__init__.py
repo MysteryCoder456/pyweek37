@@ -70,7 +70,10 @@ def main():
         car.angle += steer * car.speed / car.max_speed * CAR_STEER_SPEED
 
         # Camera motion
-        camera_speed += CAMERA_ACCELERATION * dt
+        # Camera never move faster than the car's maximum speed
+        camera_speed = min(
+            camera_speed + CAMERA_ACCELERATION * dt, car.max_speed * 0.92
+        )
 
         # Update
         car.update(dt, camera_speed)

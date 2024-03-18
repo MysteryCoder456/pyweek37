@@ -6,7 +6,7 @@ from pygame import BLEND_ALPHA_SDL2, Vector2
 from pygame.transform import rotate, scale_by
 
 CAR_SPRITE_PATH = Path(__file__).parent / "assets" / "car" / "car.png"
-CAR_SPEED_DAMPING = 0.02
+CAR_SPEED_DAMPING = 0.015
 CAR_ACCELERATION = 8
 CAR_STEER_SPEED = 3
 
