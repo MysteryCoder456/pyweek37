@@ -100,6 +100,8 @@ def main():
         ):
             yt_views -= 8 * dt  # 8 views per second lost
 
+        yt_views = max(0, yt_views)
+
         # NOTE: Draw Start
         win.fill((50, 50, 100))
 
