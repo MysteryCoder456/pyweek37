@@ -28,7 +28,11 @@ def main():
     font = Font(font_path)
 
     # Initialize game objects
+
     car = Car()
+    car.rect.centerx = win_size.x / 2  # type: ignore
+    car.rect.centery = win_size.y * 0.8  # type: ignore
+    car.angle = 90
 
     while True:
         dt = clock.tick(fps) / 1000
