@@ -1,5 +1,5 @@
 from pathlib import Path
-from random import randint
+from random import randint, random
 
 import pygame
 from pygame import BLEND_ALPHA_SDL2, Vector2
@@ -14,7 +14,7 @@ from game.car import (
 from game.road import Road
 from game.steam_pipe import SteamPipe
 
-CAMERA_ACCELERATION = 2.5
+CAMERA_ACCELERATION = 3
 
 
 def main():
@@ -35,7 +35,7 @@ def main():
 
     # Initialize game objects
 
-    camera_speed: float = 15
+    camera_speed: float = 20
     yt_views: float = 0
 
     car = Car()
@@ -54,12 +54,14 @@ def main():
     road2.rect.bottom = road1.rect.top  # type: ignore
 
     pipes: Group[SteamPipe] = Group()  # type: ignore
-    pipe = SteamPipe(pipes)
-    pipe.rect.left = road1.rect.left  # type: ignore
 
     # Game events
+
     view_gain_event = pygame.USEREVENT + 1
-    pygame.time.set_timer(view_gain_event, 15 * 1000)  # 15s interval
+    pygame.time.set_timer(view_gain_event, 10 * 1000)  # 10s interval
+
+    pipe_spawn_event = pygame.USEREVENT + 2
+    pygame.time.set_timer(pipe_spawn_event, 4 * 1000)  # 4s interval
 
     while True:
         dt = clock.tick(fps) / 1000
@@ -69,9 +71,24 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+
             elif event.type == view_gain_event:
                 view_increase = randint(2, 5) * camera_speed * 0.02
                 yt_views += view_increase
+
+            elif event.type == pipe_spawn_event:
+                if random() <= 0.3:  # 70% chance to spawn
+                    continue
+
+                pipe = SteamPipe(pipes)
+                pipe.rect.bottom = 0  # type: ignore
+
+                # Equally likely to spawn on either side
+                if random() < 0.5:
+                    pipe.rect.left = road1.rect.left  # type: ignore
+                else:
+                    pipe.rect.right = road1.rect.right  # type: ignore
+                    pipe.flipped = True
 
         # Car acceleration
         if keys[pygame.K_w]:
@@ -93,6 +110,9 @@ def main():
         car.update(dt, camera_speed)
         roads.update(dt, camera_speed)
         pipes.update(dt, camera_speed)
+
+        # Destroy offscreen pipes
+        pipes.remove([pipe for pipe in pipes if pipe.rect.top > win_size.y])  # type: ignore
 
         # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore

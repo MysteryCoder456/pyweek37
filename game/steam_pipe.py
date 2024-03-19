@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pygame
-from pygame.transform import scale_by
+from pygame.transform import flip, scale_by
 from pygame.sprite import Sprite, Group
 
 STEAM_PIPE_SPRITESHEET_PATH = (
@@ -13,24 +13,24 @@ class SteamPipe(Sprite):
     def __init__(self, *groups: Group) -> None:
         super().__init__(*groups)
 
-        pipe_width, pipe_height = 64, 32
+        frame_width, frame_height = 64, 32
 
         self.image = pygame.image.load(STEAM_PIPE_SPRITESHEET_PATH)
         self.frames = [
             scale_by(
                 self.image.subsurface(
-                    (0, i * pipe_height, pipe_width, pipe_height)
+                    (0, i * frame_height, frame_width, frame_height)
                 ),
                 2.5,
             )
             for i in range(4)
         ]
+        self.rect = pygame.FRect(self.frames[0].get_rect())
 
         self.animation_frame: int = 0
         self.animation_timer: float = 0
         self.animation_time: float = 1 / 12  # 12 fps
-
-        self.rect = pygame.FRect(self.frames[0].get_rect())
+        self.flipped = False
 
     def update(self, dt: float, camera_speed: float):  # type: ignore
         # Account for camera speed
@@ -46,4 +46,5 @@ class SteamPipe(Sprite):
             )
 
     def draw(self, surface: pygame.Surface):
-        surface.blit(self.frames[self.animation_frame], self.rect)  # type: ignore
+        frame = flip(self.frames[self.animation_frame], self.flipped, False)
+        surface.blit(frame, self.rect)  # type: ignore
