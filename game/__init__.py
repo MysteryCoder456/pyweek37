@@ -3,7 +3,7 @@ from random import randint, random
 
 import pygame
 from pygame import BLEND_ALPHA_SDL2, Vector2
-from pygame.freetype import Font
+from pygame.freetype import STYLE_STRONG, Font
 from pygame.sprite import Group, collide_mask, spritecollide
 from pygame.transform import scale_by
 
@@ -40,11 +40,14 @@ def main():
     heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"
     heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 2.5)
 
-    # Initialize game objects
+    # Game variables
 
     camera_speed: float = 30
     yt_views: float = 0
     health: int = 3
+    game_over = False
+
+    # Initialize game objects
 
     car = Car()
     car.rect.centerx = win_size.x / 2  # type: ignore
@@ -110,8 +113,10 @@ def main():
 
         # Camera motion
         # Camera never move faster than the car's maximum speed
-        camera_speed = min(
-            camera_speed + CAMERA_ACCELERATION * dt, car.max_speed * 0.9
+        camera_speed = (
+            min(camera_speed + CAMERA_ACCELERATION * dt, car.max_speed * 0.9)
+            if not game_over
+            else 0
         )
 
         # Update
@@ -124,8 +129,10 @@ def main():
 
         # Car - pipe collision
         for pipe in spritecollide(car, pipes, dokill=True, collided=collide_mask):  # type: ignore
-            # TODO: Handle game over condition
             health -= 1
+
+            if health <= 0:
+                game_over = True
 
         # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore
@@ -147,7 +154,8 @@ def main():
         for road in roads:
             road.draw(win)
 
-        car.draw(win)
+        if not game_over:
+            car.draw(win)
 
         for pipe in pipes:
             pipe.draw(win)
@@ -168,6 +176,20 @@ def main():
                     win_size.x - 5 - (1.15 * i + 1) * heart_sprite.get_width(),
                     5,
                 ),
+            )
+
+        # Draw game over text
+        if game_over:
+            game_over_text, game_over_rect = font.render(
+                "GAME OVER", "RED", size=64, style=STYLE_STRONG
+            )
+            win.blit(
+                game_over_text,
+                (
+                    (win_size.x - game_over_rect.width) / 2,
+                    (win_size.y - game_over_rect.height) / 2,
+                ),
+                special_flags=BLEND_ALPHA_SDL2,
             )
 
         pygame.display.flip()
