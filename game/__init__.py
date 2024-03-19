@@ -144,12 +144,14 @@ def main():
             road2.rect.bottom = road1.rect.top  # type: ignore
 
         # Decrease views if car goes offscreen or off road
-        if not win.get_rect().contains(car.rect) or not (  # type: ignore
-            road1.rect.left <= car.rect.centerx <= road1.rect.right  # type: ignore
+        if not game_over and not (
+            win.get_rect().contains(car.rect)  # type: ignore
+            and (
+                road1.rect.left <= car.rect.centerx <= road1.rect.right  # type: ignore
+            )
         ):
             yt_views -= 8 * dt  # 8 views per second lost
-
-        yt_views = max(0, yt_views)
+            yt_views = max(0, yt_views)
 
         # NOTE: Draw Start
         win.fill((50, 50, 100))
