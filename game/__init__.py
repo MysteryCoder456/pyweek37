@@ -12,6 +12,7 @@ from game.car import (
     Car,
 )
 from game.road import Road
+from game.steam_pipe import SteamPipe
 
 CAMERA_ACCELERATION = 2.5
 
@@ -52,6 +53,10 @@ def main():
     road2.rect.centerx = win_size.x / 2  # type: ignore
     road2.rect.bottom = road1.rect.top  # type: ignore
 
+    pipes: Group[SteamPipe] = Group()  # type: ignore
+    pipe = SteamPipe(pipes)
+    pipe.rect.left = road1.rect.left  # type: ignore
+
     # Game events
     view_gain_event = pygame.USEREVENT + 1
     pygame.time.set_timer(view_gain_event, 15 * 1000)  # 15s interval
@@ -87,6 +92,7 @@ def main():
         # Update
         car.update(dt, camera_speed)
         roads.update(dt, camera_speed)
+        pipes.update(dt, camera_speed)
 
         # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore
@@ -109,6 +115,9 @@ def main():
             road.draw(win)
 
         car.draw(win)
+
+        for pipe in pipes:
+            pipe.draw(win)
 
         view_text, _ = font.render(f"{int(yt_views)} views", "white", size=24)
         win.blit(
