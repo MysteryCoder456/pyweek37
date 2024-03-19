@@ -1,10 +1,10 @@
-from pathlib import Path
-
 import pygame
 from pygame.sprite import Sprite, Group
 from pygame.transform import scale_by
 
-ROAD_SPRITE_PATH = Path(__file__).parent / "assets" / "road" / "road.png"
+from game import ASSETS_ROOT_DIR
+
+ROAD_SPRITE_PATH = ASSETS_ROOT_DIR / "road" / "road.png"
 
 
 class Road(Sprite):

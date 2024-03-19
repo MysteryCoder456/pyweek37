@@ -5,17 +5,19 @@ import pygame
 from pygame import BLEND_ALPHA_SDL2, Vector2, Surface
 from pygame.freetype import Font
 from pygame.sprite import Group, spritecollide
-from pygame.transform import rotate
+from pygame.transform import rotate, scale_by
 
-from game.car import (
+CAMERA_ACCELERATION = 3
+ASSETS_ROOT_DIR = Path(__file__).parent / "assets"
+
+# There are imported here to avoid cyclic imports
+from game.car import (  # noqa: E402
     CAR_ACCELERATION,
     CAR_STEER_SPEED,
     Car,
 )
-from game.road import Road
-from game.steam_pipe import SteamPipe
-
-CAMERA_ACCELERATION = 3
+from game.road import Road  # noqa: E402
+from game.steam_pipe import SteamPipe  # noqa: E402
 
 
 def car_pipe_collided(car: Car, pipe: SteamPipe) -> bool:
@@ -38,9 +40,13 @@ def main():
     fps = 60
     clock = pygame.time.Clock()
 
-    # Initialize fonts
-    font_path = Path(__file__).parent / "assets" / "fonts" / "MPLUS1Code.ttf"
+    # Initialize assets
+
+    font_path = ASSETS_ROOT_DIR / "fonts" / "MPLUS1Code.ttf"
     font = Font(font_path)
+
+    heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"
+    heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 2.5)
 
     # Initialize game objects
 
@@ -154,12 +160,23 @@ def main():
         for pipe in pipes:
             pipe.draw(win)
 
-        view_text, _ = font.render(f"{int(yt_views)} views", "white", size=24)
+        # Draw view count
+        view_text, _ = font.render(f"{int(yt_views)} views", "white", size=28)
         win.blit(
             view_text,
             (5, 5),
             special_flags=BLEND_ALPHA_SDL2,
         )
+
+        # Draw hearts
+        for i in range(health):
+            win.blit(
+                heart_sprite,
+                (
+                    win_size.x - 5 - (1.15 * i + 1) * heart_sprite.get_width(),
+                    5,
+                ),
+            )
 
         pygame.display.flip()
         # NOTE: Draw End

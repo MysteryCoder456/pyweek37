@@ -1,12 +1,10 @@
-from pathlib import Path
-
 import pygame
 from pygame.transform import flip, scale_by
 from pygame.sprite import Sprite, Group
 
-STEAM_PIPE_SPRITESHEET_PATH = (
-    Path(__file__).parent / "assets" / "steam_pipe" / "steam_pipe.png"
-)
+from game import ASSETS_ROOT_DIR
+
+STEAM_PIPE_SPRITESHEET_PATH = ASSETS_ROOT_DIR / "steam_pipe" / "steam_pipe.png"
 
 
 class SteamPipe(Sprite):

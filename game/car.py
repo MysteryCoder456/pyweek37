@@ -1,11 +1,11 @@
-from pathlib import Path
-
 import pygame
 from pygame.sprite import Sprite, Group
 from pygame import BLEND_ALPHA_SDL2, Vector2
 from pygame.transform import rotate, scale_by
 
-CAR_SPRITE_PATH = Path(__file__).parent / "assets" / "car" / "car.png"
+from game import ASSETS_ROOT_DIR
+
+CAR_SPRITE_PATH = ASSETS_ROOT_DIR / "car" / "car.png"
 CAR_SPEED_DAMPING = 0.015
 CAR_ACCELERATION = 8
 CAR_STEER_SPEED = 3
