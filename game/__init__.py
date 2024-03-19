@@ -42,7 +42,7 @@ def main():
 
     # Game variables
 
-    camera_speed: float = 30
+    camera_speed: float = 35
     yt_views: float = 0
     health: int = 3
     game_over = False
@@ -124,15 +124,18 @@ def main():
         roads.update(dt, camera_speed)
         pipes.update(dt, camera_speed)
 
-        # Destroy offscreen pipes
-        pipes.remove([pipe for pipe in pipes if pipe.rect.top > win_size.y])  # type: ignore
+        for pipe in pipes:
+            # Destroy offscreen pipes
+            if pipe.rect.top > win_size.y:  # type: ignore
+                pipes.remove(pipe)
 
-        # Car - pipe collision
-        for pipe in spritecollide(car, pipes, dokill=True, collided=collide_mask):  # type: ignore
-            health -= 1
+            # Car - pipe collision
+            if collide_mask(car, pipe):
+                health -= 1
+                pipes.remove(pipe)
 
-            if health <= 0:
-                game_over = True
+                if health <= 0:
+                    game_over = True
 
         # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore
