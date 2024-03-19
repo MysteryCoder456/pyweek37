@@ -2,9 +2,10 @@ from pathlib import Path
 from random import randint, random
 
 import pygame
-from pygame import BLEND_ALPHA_SDL2, Vector2
+from pygame import BLEND_ALPHA_SDL2, Vector2, Surface
 from pygame.freetype import Font
-from pygame.sprite import Group
+from pygame.sprite import Group, spritecollide
+from pygame.transform import rotate
 
 from game.car import (
     CAR_ACCELERATION,
@@ -15,6 +16,14 @@ from game.road import Road
 from game.steam_pipe import SteamPipe
 
 CAMERA_ACCELERATION = 3
+
+
+def car_pipe_collided(car: Car, pipe: SteamPipe) -> bool:
+    car_rect: pygame.FRect = car.rect  # type: ignore
+    rotated_car_rect = rotate(Surface(car_rect.size), car.angle).get_frect(
+        center=car_rect.center
+    )
+    return rotated_car_rect.colliderect(pipe.rect)  # type: ignore
 
 
 def main():
@@ -37,6 +46,7 @@ def main():
 
     camera_speed: float = 20
     yt_views: float = 0
+    health: int = 3
 
     car = Car()
     car.rect.centerx = win_size.x / 2  # type: ignore
@@ -113,6 +123,11 @@ def main():
 
         # Destroy offscreen pipes
         pipes.remove([pipe for pipe in pipes if pipe.rect.top > win_size.y])  # type: ignore
+
+        # Car - pipe collision
+        if spritecollide(car, pipes, dokill=True, collided=car_pipe_collided):  # type: ignore
+            # TODO: Handle game over condition
+            health -= 1
 
         # Move roads to give the illusion of infinite road
         if road1.rect.top > win_size.y:  # type: ignore

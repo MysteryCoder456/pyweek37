@@ -15,7 +15,7 @@ class Road(Sprite):
         scale_factor = win_height / self.image.get_height() * 1.1
         self.image = scale_by(self.image, scale_factor)
 
-        self.rect = pygame.FRect(self.image.get_rect())  # type: ignore
+        self.rect = self.image.get_frect()  # type: ignore
 
     def update(self, dt: float, camera_speed: float):  # type: ignore
         # Account for camera speed

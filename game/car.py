@@ -16,7 +16,7 @@ class Car(Sprite):
         super().__init__(*groups)
 
         self.image = scale_by(pygame.image.load(CAR_SPRITE_PATH), 2)  # type: ignore
-        self.rect = pygame.FRect(self.image.get_rect())  # type: ignore
+        self.rect = self.image.get_frect()  # type: ignore
 
         self.angle: float = 0
         self.speed: float = 0

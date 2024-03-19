@@ -25,7 +25,7 @@ class SteamPipe(Sprite):
             )
             for i in range(4)
         ]
-        self.rect = pygame.FRect(self.frames[0].get_rect())
+        self.rect = self.frames[0].get_frect()
 
         self.animation_frame: int = 0
         self.animation_timer: float = 0
