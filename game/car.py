@@ -17,6 +17,7 @@ class Car(Sprite):
 
         self.image = scale_by(pygame.image.load(CAR_SPRITE_PATH), 2)  # type: ignore
         self.rect = self.image.get_frect()  # type: ignore
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.angle: float = 0
         self.speed: float = 0
@@ -34,6 +35,8 @@ class Car(Sprite):
 
         self.rect = self.rect.move(velocity * dt)  # type: ignore
         self.speed *= 1 - CAR_SPEED_DAMPING
+
+        self.mask = pygame.mask.from_surface(rotate(self.image, self.angle))  # type: ignore
 
     def draw(self, surface: pygame.Surface):
         img = rotate(self.image, self.angle)  # type: ignore

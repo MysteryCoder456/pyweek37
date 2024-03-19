@@ -2,12 +2,12 @@ from pathlib import Path
 from random import randint, random
 
 import pygame
-from pygame import BLEND_ALPHA_SDL2, Vector2, Surface
+from pygame import BLEND_ALPHA_SDL2, Vector2
 from pygame.freetype import Font
-from pygame.sprite import Group, spritecollide
-from pygame.transform import rotate, scale_by
+from pygame.sprite import Group, collide_mask, spritecollide
+from pygame.transform import scale_by
 
-CAMERA_ACCELERATION = 3
+CAMERA_ACCELERATION = 2.0
 ASSETS_ROOT_DIR = Path(__file__).parent / "assets"
 
 # There are imported here to avoid cyclic imports
@@ -18,14 +18,6 @@ from game.car import (  # noqa: E402
 )
 from game.road import Road  # noqa: E402
 from game.steam_pipe import SteamPipe  # noqa: E402
-
-
-def car_pipe_collided(car: Car, pipe: SteamPipe) -> bool:
-    car_rect: pygame.FRect = car.rect  # type: ignore
-    rotated_car_rect = rotate(Surface(car_rect.size), car.angle).get_frect(
-        center=car_rect.center
-    )
-    return rotated_car_rect.colliderect(pipe.rect)  # type: ignore
 
 
 def main():
@@ -50,7 +42,7 @@ def main():
 
     # Initialize game objects
 
-    camera_speed: float = 20
+    camera_speed: float = 30
     yt_views: float = 0
     health: int = 3
 
@@ -77,7 +69,7 @@ def main():
     pygame.time.set_timer(view_gain_event, 10 * 1000)  # 10s interval
 
     pipe_spawn_event = pygame.USEREVENT + 2
-    pygame.time.set_timer(pipe_spawn_event, 4 * 1000)  # 4s interval
+    pygame.time.set_timer(pipe_spawn_event, 3 * 1000)  # 3s interval
 
     while True:
         dt = clock.tick(fps) / 1000
@@ -131,7 +123,7 @@ def main():
         pipes.remove([pipe for pipe in pipes if pipe.rect.top > win_size.y])  # type: ignore
 
         # Car - pipe collision
-        if spritecollide(car, pipes, dokill=True, collided=car_pipe_collided):  # type: ignore
+        for pipe in spritecollide(car, pipes, dokill=True, collided=collide_mask):  # type: ignore
             # TODO: Handle game over condition
             health -= 1
 

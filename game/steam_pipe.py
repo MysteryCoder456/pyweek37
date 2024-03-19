@@ -24,6 +24,7 @@ class SteamPipe(Sprite):
             for i in range(4)
         ]
         self.rect = self.frames[0].get_frect()
+        self.mask = pygame.mask.from_surface(self.frames[0])
 
         self.animation_frame: int = 0
         self.animation_timer: float = 0
