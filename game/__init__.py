@@ -4,7 +4,7 @@ from random import randint, random
 import pygame
 from pygame import BLEND_ALPHA_SDL2, Vector2
 from pygame.freetype import STYLE_STRONG, Font
-from pygame.sprite import Group, collide_mask, spritecollide
+from pygame.sprite import Group, collide_mask
 from pygame.transform import scale_by
 
 CAMERA_ACCELERATION = 2.0
@@ -51,7 +51,7 @@ def main():
 
     car = Car()
     car.rect.centerx = win_size.x / 2  # type: ignore
-    car.rect.centery = win_size.y * 0.8  # type: ignore
+    car.rect.centery = win_size.y * 0.75  # type: ignore
     car.angle = 90
 
     roads: Group[Road] = Group()  # type: ignore
