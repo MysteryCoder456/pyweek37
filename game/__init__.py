@@ -6,6 +6,7 @@ from pygame import Vector2
 
 ASSETS_ROOT_DIR = Path(__file__).parent / "assets"
 WINDOW_SIZE = Vector2(1000, 750)
+GAME_STATE_CHANGE_EVENT = pygame.USEREVENT + 99
 
 # Importing this here to avoid cyclic imports
 from game.scenes import MainGameScene  # noqa: E402
@@ -26,9 +27,8 @@ def main():
     fps = 60
     clock = pygame.time.Clock()
 
+    # Initial game state
     game_state = GameState.MAIN_GAME
-
-    # enter
     game_state.value.on_enter()
 
     while True:
@@ -38,11 +38,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            elif event.type == GAME_STATE_CHANGE_EVENT:
+                # Transition states
+                game_state = event.dict["new_state"]
+                game_state.on_enter()
+
+                # Cancel state change timer
+                pygame.time.set_timer(GAME_STATE_CHANGE_EVENT, 0)
 
             game_state.value.on_event(event)
 
-        # update
         game_state.value.on_update(dt)
-
-        # Draw
         game_state.value.on_draw(win)
