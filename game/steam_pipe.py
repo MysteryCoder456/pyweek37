@@ -22,12 +22,17 @@ class SteamPipe(Sprite):
             for i in range(4)
         ]
         self.rect = self.frames[0].get_frect()
-        self.mask = pygame.mask.from_surface(self.frames[0])
 
         self.animation_frame: int = 0
         self.animation_timer: float = 0
         self.animation_time: float = 1 / 12  # 12 fps
         self.flipped = False
+
+    @property
+    def mask(self) -> pygame.Mask:
+        return pygame.mask.from_surface(
+            flip(self.frames[self.animation_frame], self.flipped, False)
+        )
 
     def update(self, dt: float, camera_speed: float):  # type: ignore
         # Account for camera speed
