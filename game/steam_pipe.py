@@ -12,6 +12,8 @@ class SteamPipe(Sprite):
         super().__init__(*groups)
 
         frame_width, frame_height = 64, 32
+        frame_count = 4
+        scale_factor = 2.5
 
         self.image = pygame.image.load(STEAM_PIPE_SPRITESHEET_PATH)
         self.frames = [
@@ -19,9 +21,9 @@ class SteamPipe(Sprite):
                 self.image.subsurface(
                     (0, i * frame_height, frame_width, frame_height)
                 ),
-                2.5,
+                scale_factor,
             )
-            for i in range(4)
+            for i in range(frame_count)
         ]
         self.rect = self.frames[0].get_frect()
 
