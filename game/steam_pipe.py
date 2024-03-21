@@ -2,7 +2,7 @@ import pygame
 from pygame.transform import flip, scale_by
 from pygame.sprite import Sprite, Group
 
-from game import ASSETS_ROOT_DIR
+from game.constants import ASSETS_ROOT_DIR
 
 STEAM_PIPE_SPRITESHEET_PATH = ASSETS_ROOT_DIR / "steam_pipe" / "steam_pipe.png"
 
@@ -16,9 +16,7 @@ class SteamPipe(Sprite):
         self.image = pygame.image.load(STEAM_PIPE_SPRITESHEET_PATH)
         self.frames = [
             scale_by(
-                self.image.subsurface(
-                    (0, i * frame_height, frame_width, frame_height)
-                ),
+                self.image.subsurface((0, i * frame_height, frame_width, frame_height)),
                 2.5,
             )
             for i in range(4)
@@ -40,9 +38,7 @@ class SteamPipe(Sprite):
 
         if self.animation_timer >= self.animation_time:
             self.animation_timer -= self.animation_time
-            self.animation_frame = (self.animation_frame + 1) % len(
-                self.frames
-            )
+            self.animation_frame = (self.animation_frame + 1) % len(self.frames)
 
     def draw(self, surface: pygame.Surface):
         frame = flip(self.frames[self.animation_frame], self.flipped, False)

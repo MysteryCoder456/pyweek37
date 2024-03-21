@@ -1,19 +1,9 @@
-from pathlib import Path
-from enum import Enum
-
 import pygame
-from pygame import Vector2
 
-ASSETS_ROOT_DIR = Path(__file__).parent / "assets"
-WINDOW_SIZE = Vector2(1000, 750)
-GAME_STATE_CHANGE_EVENT = pygame.USEREVENT + 99
-
-# Importing this here to avoid cyclic imports
-from game.scenes import MainGameScene  # noqa: E402
-
-
-class GameState(Enum):
-    MAIN_GAME = MainGameScene()
+from game.constants import WINDOW_SIZE, GAME_STATE_CHANGE_EVENT
+from game.game_state import GameState
+from game.scene import Scene
+from game.scenes import MainMenuScene, MainGameScene
 
 
 def main():
@@ -27,9 +17,15 @@ def main():
     fps = 60
     clock = pygame.time.Clock()
 
+    state_scene_map: dict[GameState, Scene] = {
+        GameState.MAIN_MENU: MainMenuScene(),
+        GameState.MAIN_GAME: MainGameScene(),
+    }
+
     # Initial game state
     game_state = GameState.MAIN_GAME
-    game_state.value.on_enter()
+    current_scene = state_scene_map[game_state]
+    current_scene.on_enter()
 
     while True:
         dt = clock.tick(fps) / 1000
@@ -40,13 +36,20 @@ def main():
                 return
             elif event.type == GAME_STATE_CHANGE_EVENT:
                 # Transition states
-                game_state = event.dict["new_state"]
-                game_state.on_enter()
+                new_state: GameState = event.dict["new_state"]
+
+                if new_state in state_scene_map:
+                    game_state = new_state
+                    current_scene = state_scene_map[game_state]
+                else:
+                    raise Exception(
+                        f"GameState.{new_state.name} has not been mapped to any scene!"
+                    )
 
                 # Cancel state change timer
                 pygame.time.set_timer(GAME_STATE_CHANGE_EVENT, 0)
 
-            game_state.value.on_event(event)
+            current_scene.on_event(event)
 
-        game_state.value.on_update(dt)
-        game_state.value.on_draw(win)
+        current_scene.on_update(dt)
+        current_scene.on_draw(win)

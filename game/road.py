@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite, Group
 from pygame.transform import scale_by
 
-from game import ASSETS_ROOT_DIR
+from game.constants import ASSETS_ROOT_DIR
 
 ROAD_SPRITE_PATH = ASSETS_ROOT_DIR / "road" / "road.png"
 

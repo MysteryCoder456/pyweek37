@@ -6,7 +6,12 @@ from pygame.freetype import STYLE_STRONG, Font
 from pygame.sprite import Group, collide_mask
 from pygame.transform import scale_by
 
-from game import ASSETS_ROOT_DIR, WINDOW_SIZE, GAME_STATE_CHANGE_EVENT
+from game.game_state import GameState
+from game.constants import (
+    ASSETS_ROOT_DIR,
+    WINDOW_SIZE,
+    GAME_STATE_CHANGE_EVENT,
+)
 from game.scene import Scene
 from game.car import (
     CAR_ACCELERATION,
@@ -127,8 +132,11 @@ class MainGameScene(Scene):
                 if self.health <= 0:
                     self.game_over = True
 
-                    # event = pygame.Event(STATE_CHANGE_EVENT, {"new_state": GameState.MAIN_MENU})
-                    # pygame.time.set_timer(event, 5000)
+                    event = pygame.Event(
+                        GAME_STATE_CHANGE_EVENT,
+                        {"new_state": GameState.MAIN_MENU},
+                    )
+                    pygame.time.set_timer(event, 5000)
 
         # Move roads to give the illusion of infinite road
         if self.road1.rect.top > WINDOW_SIZE.y:  # type: ignore
