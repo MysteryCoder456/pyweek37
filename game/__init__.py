@@ -23,7 +23,7 @@ def main():
     }
 
     # Initial game state
-    game_state = GameState.MAIN_GAME
+    game_state = GameState.MAIN_MENU
     current_scene = state_scene_map[game_state]
     current_scene.on_enter()
 
@@ -41,6 +41,7 @@ def main():
                 if new_state in state_scene_map:
                     game_state = new_state
                     current_scene = state_scene_map[game_state]
+                    current_scene.on_enter()
                 else:
                     raise Exception(
                         f"GameState.{new_state.name} has not been mapped to any scene!"
@@ -49,7 +50,8 @@ def main():
                 # Cancel state change timer
                 pygame.time.set_timer(GAME_STATE_CHANGE_EVENT, 0)
 
-            current_scene.on_event(event)
+            else:
+                current_scene.on_event(event)
 
         current_scene.on_update(dt)
         current_scene.on_draw(win)
