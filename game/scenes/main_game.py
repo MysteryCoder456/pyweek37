@@ -107,7 +107,7 @@ class MainGameScene(Scene):
         self.camera_speed = (
             min(
                 self.camera_speed + CAMERA_ACCELERATION * dt,
-                self.car.max_speed * 0.9,
+                self.car.max_speed * 0.8,
             )
             if not self.game_over
             else 0
