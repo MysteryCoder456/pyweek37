@@ -1,7 +1,9 @@
+import sys
+
 import pygame
 from pygame.freetype import Font
 from pygame_gui import UI_BUTTON_PRESSED, UIManager
-from pygame_gui.elements import UIButton
+from pygame_gui.elements import UIButton, UILabel
 
 from game.constants import (
     ASSETS_ROOT_DIR,
@@ -19,12 +21,24 @@ class MainMenuScene(Scene):
         font_path = ASSETS_ROOT_DIR / "fonts" / "MPLUS1Code.ttf"
         self.font = Font(font_path)
 
-        play_btn_rect = pygame.Rect(0, 0, 100, 50)
-        play_btn_rect.center = WINDOW_SIZE / 2
-        self.play_btn = UIButton(
-            relative_rect=play_btn_rect,
-            text="PLAY",
+        self.title_label = UILabel(
+            relative_rect=pygame.Rect(0, 100, 200, 60),
+            text="The Boring Game",
             manager=self.ui,
+            anchors={"centerx": "centerx", "top": "top"},
+        )
+
+        self.play_btn = UIButton(
+            relative_rect=pygame.Rect(0, -40, 80, 50),
+            text="Play",
+            manager=self.ui,
+            anchors={"center": "center"},
+        )
+        self.quit_btn = UIButton(
+            relative_rect=pygame.Rect(0, 40, 80, 50),
+            text="Quit",
+            manager=self.ui,
+            anchors={"center": "center"},
         )
 
     def on_event(self, event: pygame.Event) -> None:
@@ -35,6 +49,10 @@ class MainMenuScene(Scene):
                     GAME_STATE_CHANGE_EVENT, {"new_state": GameState.MAIN_GAME}
                 )
                 pygame.event.post(event)
+
+            elif event.ui_element == self.quit_btn:
+                pygame.quit()
+                sys.exit()
 
         self.ui.process_events(event)
 
