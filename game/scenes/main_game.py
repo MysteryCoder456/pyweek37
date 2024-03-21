@@ -1,3 +1,4 @@
+import os
 from random import randint, random
 
 import pygame
@@ -5,10 +6,12 @@ from pygame import BLEND_ALPHA_SDL2
 from pygame.freetype import STYLE_STRONG, Font
 from pygame.sprite import Group, collide_mask
 from pygame.transform import scale_by
+from pygame.event import custom_type
 
 from game.game_state import GameState
 from game.constants import (
     ASSETS_ROOT_DIR,
+    DATA_ROOT_DIR,
     WINDOW_SIZE,
     GAME_STATE_CHANGE_EVENT,
 )
@@ -33,6 +36,16 @@ class MainGameScene(Scene):
 
         heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"
         self.heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 2.5)
+
+        # Load high score
+
+        self.high_score_path = DATA_ROOT_DIR / "high_score.txt"
+
+        if os.path.exists(self.high_score_path):
+            with open(self.high_score_path) as f:
+                self.high_score = int(f.read())
+        else:
+            self.high_score = None
 
         # Game variables
 
@@ -62,11 +75,13 @@ class MainGameScene(Scene):
 
         # Game events
 
-        self.view_gain_event = pygame.USEREVENT + 1
+        self.view_gain_event = custom_type()
         pygame.time.set_timer(self.view_gain_event, 10 * 1000)  # 10s interval
 
-        self.pipe_spawn_event = pygame.USEREVENT + 2
+        self.pipe_spawn_event = custom_type()
         pygame.time.set_timer(self.pipe_spawn_event, 3 * 1000)  # 3s interval
+
+        self.game_over_event = custom_type()
 
     def on_event(self, event: pygame.Event) -> None:
         if event.type == self.view_gain_event:
@@ -74,7 +89,7 @@ class MainGameScene(Scene):
             self.yt_views += view_increase
 
         elif event.type == self.pipe_spawn_event:
-            if random() <= 0.3:  # 70% chance to spawn
+            if random() <= 0.35:  # 65% chance to spawn
                 return
 
             pipe = SteamPipe(self.pipes)
@@ -86,6 +101,19 @@ class MainGameScene(Scene):
             else:
                 pipe.rect.right = self.road1.rect.right  # type: ignore
                 pipe.flipped = True
+
+        elif event.type == self.game_over_event:
+            # Update high score
+            self.high_score = max(int(self.yt_views), self.high_score or 0)
+            with open(self.high_score_path, "w") as f:
+                f.write(str(self.high_score))
+
+            # Transition scene to main menu afer 5s
+            event = pygame.Event(
+                GAME_STATE_CHANGE_EVENT,
+                {"new_state": GameState.MAIN_MENU},
+            )
+            pygame.time.set_timer(event, 5000)
 
     def on_update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
@@ -131,12 +159,7 @@ class MainGameScene(Scene):
                 # Check for game over
                 if self.health <= 0:
                     self.game_over = True
-
-                    event = pygame.Event(
-                        GAME_STATE_CHANGE_EVENT,
-                        {"new_state": GameState.MAIN_MENU},
-                    )
-                    pygame.time.set_timer(event, 5000)
+                    pygame.event.post(pygame.Event(self.game_over_event))
 
         # Move roads to give the illusion of infinite road
         if self.road1.rect.top > WINDOW_SIZE.y:  # type: ignore
@@ -168,14 +191,25 @@ class MainGameScene(Scene):
             pipe.draw(window)
 
         # Draw view count
-        view_text, _ = self.font.render(
-            f"{int(self.yt_views)} views", "white", size=28
+        view_text, view_rect = self.font.render(
+            f"{int(self.yt_views)} views", "white", size=24
         )
         window.blit(
             view_text,
             (5, 5),
             special_flags=BLEND_ALPHA_SDL2,
         )
+
+        # Draw best view count
+        if high_score := self.high_score:
+            high_score_text, _ = self.font.render(
+                f"Best: {high_score} views", "white", size=24
+            )
+            window.blit(
+                high_score_text,
+                (5, view_rect.bottom + 5),
+                special_flags=BLEND_ALPHA_SDL2,
+            )
 
         # Draw hearts
         for i in range(self.health):
