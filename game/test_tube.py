@@ -13,12 +13,14 @@ class TestTube(Sprite):
 
         frame_width, frame_height = 64, 64
         frame_count = 12
-        scale_factor = 1
+        scale_factor = 1.5
 
         self.image = pygame.image.load(TEST_TUBE_SPRITESHEET_PATH)
         self.frames = [
             scale_by(
-                self.image.subsurface((0, i * frame_height, frame_width, frame_height)),
+                self.image.subsurface(
+                    (0, i * frame_height, frame_width, frame_height)
+                ),
                 scale_factor,
             )
             for i in range(frame_count)
@@ -39,7 +41,9 @@ class TestTube(Sprite):
 
         if self.animation_timer >= self.animation_time:
             self.animation_timer -= self.animation_time
-            self.animation_frame = (self.animation_frame + 1) % len(self.frames)
+            self.animation_frame = (self.animation_frame + 1) % len(
+                self.frames
+            )
 
     def draw(self, surface: pygame.Surface):
         frame = self.frames[self.animation_frame]

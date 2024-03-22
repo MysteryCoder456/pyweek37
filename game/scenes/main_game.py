@@ -179,6 +179,9 @@ class MainGameScene(Scene):
                 self.car_sfx_channel.stop()
 
     def on_update(self, dt: float) -> None:
+        if self.game_over:
+            return
+
         keys = pygame.key.get_pressed()
 
         # Car acceleration
@@ -195,13 +198,9 @@ class MainGameScene(Scene):
 
         # Camera motion
         # Camera never move faster than the car's maximum speed
-        self.camera_speed = (
-            min(
-                self.camera_speed + CAMERA_ACCELERATION * dt,
-                self.car.max_speed * 0.8,
-            )
-            if not self.game_over
-            else 0
+        self.camera_speed = min(
+            self.camera_speed + CAMERA_ACCELERATION * dt,
+            self.car.max_speed * 0.8,
         )
 
         # Update
@@ -253,14 +252,20 @@ class MainGameScene(Scene):
         if self.road2.rect.top > WINDOW_SIZE.y:  # type: ignore
             self.road2.rect.bottom = self.road1.rect.top  # type: ignore
 
-        # Decrease views if car goes offscreen or off road
+        # Decrease views if car goes offscreen
         win_rect = pygame.FRect(0, 0, WINDOW_SIZE.x, WINDOW_SIZE.y)
-        if not self.game_over and not (
-            win_rect.contains(self.car.rect)  # type: ignore
-            and (
-                self.road1.rect.left <= self.car.rect.centerx <= self.road1.rect.right  # type: ignore
-            )
+        if not win_rect.contains(self.car.rect):  # type: ignore
+            self.yt_views -= 8 * dt  # 8 views per second lost
+            self.yt_views = max(0, self.yt_views)
+
+        # Slow down car and decrease views if it goes offroad
+        car_rect = self.car.mask.get_rect()
+        car_rect.center = self.car.rect.center  # type: ignore
+        if not (
+            self.road1.rect.left - 50 <= car_rect.left  # type: ignore
+            and car_rect.right <= self.road1.rect.right + 50  # type: ignore
         ):
+            self.car.speed *= 0.92
             self.yt_views -= 8 * dt  # 8 views per second lost
             self.yt_views = max(0, self.yt_views)
 

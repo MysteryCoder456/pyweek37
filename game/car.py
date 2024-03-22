@@ -17,7 +17,7 @@ class Car(Sprite):
 
         frame_width, frame_height = 64, 64
         frame_count = 14
-        scale_factor = 2
+        scale_factor = 2.5
 
         self.image = pygame.image.load(CAR_SPRITE_PATH)
         self.frames = [
@@ -30,7 +30,6 @@ class Car(Sprite):
             for i in range(frame_count)
         ]
         self.rect = self.frames[0].get_frect()  # type: ignore
-        self.mask = pygame.mask.from_surface(self.frames[0])
 
         self.animation_frame: int = 0
         self.animation_timer: float = 0
@@ -41,6 +40,11 @@ class Car(Sprite):
 
         # Got this result using some basic algebra
         self.max_speed = CAR_ACCELERATION * (1 / CAR_SPEED_DAMPING - 1)
+
+    @property
+    def mask(self) -> pygame.Mask:
+        frame = rotate(self.frames[self.animation_frame], self.angle)
+        return pygame.mask.from_surface(frame)
 
     def update(self, dt: float, camera_speed: float):  # type: ignore
         # Animation
@@ -61,10 +65,6 @@ class Car(Sprite):
 
         self.rect = self.rect.move(velocity * dt)  # type: ignore
         self.speed *= 1 - CAR_SPEED_DAMPING
-
-        self.mask = pygame.mask.from_surface(
-            rotate(self.frames[self.animation_frame], self.angle)
-        )
 
     def draw(self, surface: pygame.Surface):
         img = rotate(self.frames[self.animation_frame], self.angle)  # type: ignore
