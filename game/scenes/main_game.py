@@ -308,7 +308,7 @@ class MainGameScene(Scene):
         # Draw game over text
         if self.game_over:
             game_over_text, game_over_rect = self.font.render(
-                "GAME OVER", "RED", size=64, style=STYLE_STRONG
+                "LIVESTREAM ENDED", "RED", size=64, style=STYLE_STRONG
             )
             window.blit(
                 game_over_text,
