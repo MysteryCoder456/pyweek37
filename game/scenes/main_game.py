@@ -14,6 +14,7 @@ from game.constants import (
     DATA_ROOT_DIR,
     WINDOW_SIZE,
     GAME_STATE_CHANGE_EVENT,
+    CAMERA_ACCELERATION,
 )
 from game.scene import Scene
 from game.car import (
@@ -23,8 +24,7 @@ from game.car import (
 )
 from game.road import Road
 from game.steam_pipe import SteamPipe
-
-CAMERA_ACCELERATION = 2.0
+from game.test_tube import TestTube
 
 
 class MainGameScene(Scene):
@@ -72,6 +72,7 @@ class MainGameScene(Scene):
         self.road2.rect.bottom = self.road1.rect.top  # type: ignore
 
         self.pipes: Group[SteamPipe] = Group()  # type: ignore
+        self.tubes: Group[TestTube] = Group()  # type: ignore
 
         # Game events
 
@@ -81,10 +82,17 @@ class MainGameScene(Scene):
         self.pipe_spawn_event = custom_type()
         pygame.time.set_timer(self.pipe_spawn_event, 3 * 1000)  # 3s interval
 
+        self.tube_spawn_event = custom_type()
+
+        self.begin_tube_spawning_event = custom_type()
+        pygame.time.set_timer(
+            self.begin_tube_spawning_event, 60 * 1000
+        )  # Begin spawning tubes after 60s
+
         self.game_over_event = custom_type()
 
     def on_event(self, event: pygame.Event) -> None:
-        if event.type == self.view_gain_event:
+        if event.type == self.view_gain_event and not self.game_over:
             view_increase = randint(2, 5) * self.camera_speed * 0.02
             self.yt_views += view_increase
 
@@ -101,6 +109,26 @@ class MainGameScene(Scene):
             else:
                 pipe.rect.right = self.road1.rect.right  # type: ignore
                 pipe.flipped = True
+
+        elif event.type == self.tube_spawn_event:
+            if random() <= 0.50:  # 50% chance to spawn
+                return
+
+            tube = TestTube(self.tubes)
+            tube.rect.bottom = 0  # type: ignore
+
+            # Equally likely to spawn on either side
+            road_quarter_width = self.road1.rect.width / 4  # type: ignore
+            if random() < 0.5:
+                tube.rect.centerx = self.road1.rect.left + road_quarter_width  # type: ignore
+            else:
+                tube.rect.centerx = self.road1.rect.right - road_quarter_width  # type: ignore
+
+        elif event.type == self.begin_tube_spawning_event:
+            pygame.time.set_timer(self.tube_spawn_event, 20 * 1000)  # 20s interval
+
+            # Cancel begin tube spawning event
+            pygame.time.set_timer(self.begin_tube_spawning_event, 0)
 
         elif event.type == self.game_over_event:
             # Update high score
@@ -126,9 +154,7 @@ class MainGameScene(Scene):
 
         # Car steering
         steer = int(keys[pygame.K_a]) - int(keys[pygame.K_d])
-        self.car.angle += (
-            steer * self.car.speed / self.car.max_speed * CAR_STEER_SPEED
-        )
+        self.car.angle += steer * self.car.speed / self.car.max_speed * CAR_STEER_SPEED
 
         # Camera motion
         # Camera never move faster than the car's maximum speed
@@ -145,6 +171,7 @@ class MainGameScene(Scene):
         self.car.update(dt, self.camera_speed)
         self.roads.update(dt, self.camera_speed)
         self.pipes.update(dt, self.camera_speed)
+        self.tubes.update(dt, self.camera_speed)
 
         for pipe in self.pipes:
             # Destroy offscreen pipes
@@ -160,6 +187,26 @@ class MainGameScene(Scene):
                 if self.health <= 0:
                     self.game_over = True
                     pygame.event.post(pygame.Event(self.game_over_event))
+                    break
+
+        for tube in self.tubes:
+            # Destroy offscreen tubes
+            if tube.rect.top > WINDOW_SIZE.y:  # type: ignore
+                self.tubes.remove(tube)
+
+            # Car - pipe collision
+            if collide_mask(self.car, tube):
+                self.tubes.remove(tube)
+                self.health -= 1
+
+                # Check for game over
+                if self.health <= 0:
+                    self.game_over = True
+                    pygame.event.post(pygame.Event(self.game_over_event))
+                    break
+
+                view_increase = randint(10, 15) * self.camera_speed * 0.02
+                self.yt_views += view_increase
 
         # Move roads to give the illusion of infinite road
         if self.road1.rect.top > WINDOW_SIZE.y:  # type: ignore
@@ -183,6 +230,9 @@ class MainGameScene(Scene):
 
         for road in self.roads:
             road.draw(window)
+
+        for tube in self.tubes:
+            tube.draw(window)
 
         if not self.game_over:
             self.car.draw(window)
@@ -216,9 +266,7 @@ class MainGameScene(Scene):
             window.blit(
                 self.heart_sprite,
                 (
-                    WINDOW_SIZE.x
-                    - 5
-                    - (1.15 * i + 1) * self.heart_sprite.get_width(),
+                    WINDOW_SIZE.x - 5 - (1.15 * i + 1) * self.heart_sprite.get_width(),
                     5,
                 ),
             )

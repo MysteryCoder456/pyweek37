@@ -6,3 +6,4 @@ ASSETS_ROOT_DIR = Path(__file__).parent / "assets"
 DATA_ROOT_DIR = Path(__file__).parent / "data"
 WINDOW_SIZE = Vector2(1000, 750)
 GAME_STATE_CHANGE_EVENT = custom_type()
+CAMERA_ACCELERATION = 2.0
