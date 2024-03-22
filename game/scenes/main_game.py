@@ -40,6 +40,10 @@ class MainGameScene(Scene):
 
         accelerate_sfx_path = ASSETS_ROOT_DIR / "car" / "accelerate.wav"
         self.accelerate_sfx = Sound(accelerate_sfx_path)
+
+        death_sfx_path = ASSETS_ROOT_DIR / "car" / "death.wav"
+        self.death_sfx = Sound(death_sfx_path)
+
         self.car_sfx_channel = Channel(0)
         self.car_sfx_channel.set_volume(0.6)
 
@@ -159,6 +163,9 @@ class MainGameScene(Scene):
                 {"new_state": GameState.MAIN_MENU},
             )
             pygame.time.set_timer(event, 5000)
+
+            # Play SFX
+            self.car_sfx_channel.play(self.death_sfx)
 
         elif event.type == KEYDOWN:
             if event.key == pygame.K_w:
