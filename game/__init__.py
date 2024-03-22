@@ -1,6 +1,7 @@
+import os
 import pygame
 
-from game.constants import WINDOW_SIZE, GAME_STATE_CHANGE_EVENT
+from game.constants import WINDOW_SIZE, GAME_STATE_CHANGE_EVENT, DATA_ROOT_DIR
 from game.game_state import GameState
 from game.scene import Scene
 from game.scenes import MainMenuScene, MainGameScene
@@ -8,6 +9,9 @@ from game.scenes import MainMenuScene, MainGameScene
 
 def main():
     pygame.init()
+
+    # Make sure data directory exists
+    os.makedirs(DATA_ROOT_DIR, exist_ok=True)
 
     # Initialize display
     win = pygame.display.set_mode(WINDOW_SIZE)
