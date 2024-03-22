@@ -2,11 +2,12 @@ import os
 from random import randint, random
 
 import pygame
-from pygame import BLEND_ALPHA_SDL2
+from pygame import BLEND_ALPHA_SDL2, KEYDOWN, KEYUP
 from pygame.freetype import STYLE_STRONG, Font
 from pygame.sprite import Group, collide_mask
 from pygame.transform import scale_by
 from pygame.event import custom_type
+from pygame.mixer import Sound, Channel
 
 from game.game_state import GameState
 from game.constants import (
@@ -36,6 +37,20 @@ class MainGameScene(Scene):
 
         heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"
         self.heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 2.5)
+
+        accelerate_sfx_path = ASSETS_ROOT_DIR / "car" / "accelerate.wav"
+        self.accelerate_sfx = Sound(accelerate_sfx_path)
+        self.car_sfx_channel = Channel(0)
+        self.car_sfx_channel.set_volume(0.6)
+
+        pipe_sfx_path = ASSETS_ROOT_DIR / "steam_pipe" / "hit.wav"
+        self.pipe_hit_sfx = Sound(pipe_sfx_path)
+
+        tube_sfx_path = ASSETS_ROOT_DIR / "test_tube" / "hit.wav"
+        self.tube_hit_sfx = Sound(tube_sfx_path)
+
+        self.obstacle_sfx_channel = Channel(1)
+        self.obstacle_sfx_channel.set_volume(0.7)
 
         # Load high score
 
@@ -125,7 +140,9 @@ class MainGameScene(Scene):
                 tube.rect.centerx = self.road1.rect.right - road_quarter_width  # type: ignore
 
         elif event.type == self.begin_tube_spawning_event:
-            pygame.time.set_timer(self.tube_spawn_event, 20 * 1000)  # 20s interval
+            pygame.time.set_timer(
+                self.tube_spawn_event, 20 * 1000
+            )  # 20s interval
 
             # Cancel begin tube spawning event
             pygame.time.set_timer(self.begin_tube_spawning_event, 0)
@@ -143,6 +160,17 @@ class MainGameScene(Scene):
             )
             pygame.time.set_timer(event, 5000)
 
+        elif event.type == KEYDOWN:
+            if event.key == pygame.K_w:
+                self.car_sfx_channel.play(self.accelerate_sfx, loops=-1)
+
+        elif event.type == KEYUP:
+            if (
+                event.key == pygame.K_w
+                and self.car_sfx_channel.get_sound() == self.accelerate_sfx
+            ):
+                self.car_sfx_channel.stop()
+
     def on_update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
 
@@ -154,7 +182,9 @@ class MainGameScene(Scene):
 
         # Car steering
         steer = int(keys[pygame.K_a]) - int(keys[pygame.K_d])
-        self.car.angle += steer * self.car.speed / self.car.max_speed * CAR_STEER_SPEED
+        self.car.angle += (
+            steer * self.car.speed / self.car.max_speed * CAR_STEER_SPEED
+        )
 
         # Camera motion
         # Camera never move faster than the car's maximum speed
@@ -182,6 +212,7 @@ class MainGameScene(Scene):
             if collide_mask(self.car, pipe):
                 self.health -= 1
                 self.pipes.remove(pipe)
+                self.obstacle_sfx_channel.play(self.pipe_hit_sfx)
 
                 # Check for game over
                 if self.health <= 0:
@@ -196,8 +227,9 @@ class MainGameScene(Scene):
 
             # Car - pipe collision
             if collide_mask(self.car, tube):
-                self.tubes.remove(tube)
                 self.health -= 1
+                self.tubes.remove(tube)
+                self.obstacle_sfx_channel.play(self.tube_hit_sfx)
 
                 # Check for game over
                 if self.health <= 0:
@@ -266,7 +298,9 @@ class MainGameScene(Scene):
             window.blit(
                 self.heart_sprite,
                 (
-                    WINDOW_SIZE.x - 5 - (1.15 * i + 1) * self.heart_sprite.get_width(),
+                    WINDOW_SIZE.x
+                    - 5
+                    - (1.15 * i + 1) * self.heart_sprite.get_width(),
                     5,
                 ),
             )
