@@ -1,7 +1,11 @@
 import os
 import pygame
 
-from game.constants import WINDOW_SIZE, GAME_STATE_CHANGE_EVENT, DATA_ROOT_DIR
+from game.constants import (
+    WINDOW_SIZE,
+    GAME_STATE_CHANGE_EVENT,
+    DATA_ROOT_DIR,
+)
 from game.game_state import GameState
 from game.scene import Scene
 from game.scenes import MainMenuScene, MainGameScene

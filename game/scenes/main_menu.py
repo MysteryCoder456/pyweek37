@@ -15,6 +15,13 @@ from game.scene import Scene
 
 class MainMenuScene(Scene):
     def on_enter(self) -> None:
+        # Play background music
+        music_path = ASSETS_ROOT_DIR / "music" / "main_menu.wav"
+        self.bg_music = pygame.mixer.Sound(music_path)
+        self.channel = pygame.mixer.Channel(0)
+        self.channel.set_volume(0.25)
+        self.channel.play(self.bg_music, loops=-1, fade_ms=5000)
+
         theme_path = ASSETS_ROOT_DIR / "ui" / "theme.json"
         self.ui = UIManager(
             (int(WINDOW_SIZE.x), int(WINDOW_SIZE.y)),

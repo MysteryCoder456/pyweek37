@@ -43,6 +43,12 @@ class MainGameScene(Scene):
             str(theme_path),
         )
 
+        music_path = ASSETS_ROOT_DIR / "music" / "main_game.wav"
+        self.bg_music = Sound(music_path)
+        self.bgm_channel = Channel(0)
+        self.bgm_channel.set_volume(0.25)
+        self.bgm_channel.play(self.bg_music, loops=-1, fade_ms=2500)
+
         font_path = ASSETS_ROOT_DIR / "ui" / "PixelifySans.ttf"
         self.font = Font(font_path)
 
@@ -55,8 +61,8 @@ class MainGameScene(Scene):
         death_sfx_path = ASSETS_ROOT_DIR / "car" / "death.wav"
         self.death_sfx = Sound(death_sfx_path)
 
-        self.car_sfx_channel = Channel(0)
-        self.car_sfx_channel.set_volume(0.6)
+        self.car_sfx_channel = Channel(1)
+        self.car_sfx_channel.set_volume(0.65)
 
         pipe_sfx_path = ASSETS_ROOT_DIR / "steam_pipe" / "hit.wav"
         self.pipe_hit_sfx = Sound(pipe_sfx_path)
@@ -67,8 +73,8 @@ class MainGameScene(Scene):
         heal_sfx_path = ASSETS_ROOT_DIR / "heart" / "hit.wav"
         self.heal_sfx = Sound(heal_sfx_path)
 
-        self.obstacle_sfx_channel = Channel(1)
-        self.obstacle_sfx_channel.set_volume(0.7)
+        self.obstacle_sfx_channel = Channel(2)
+        self.obstacle_sfx_channel.set_volume(0.8)
 
         # Load high score
 
