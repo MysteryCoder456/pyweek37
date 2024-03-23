@@ -1,7 +1,6 @@
 import sys
 
 import pygame
-from pygame.freetype import Font
 from pygame_gui import UI_BUTTON_PRESSED, UIManager
 from pygame_gui.elements import UIButton, UILabel
 
