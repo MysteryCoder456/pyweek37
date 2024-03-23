@@ -1,5 +1,16 @@
 {
+    "defaults": {
+        "colours": {
+            "normal_text": "#1B1B1E"
+        }
+    },
     "button": {
+        "colours": {
+            "normal_bg": "rgba(0, 0, 0, 0)",
+            "hovered_bg": "rgba(0, 0, 0, 0)",
+            "hovered_text": "#A22C29",
+            "hovered_border": "#A22C29"
+        },
         "font": {
             "name": "Pixelify Sans",
             "size": 20,
@@ -21,7 +32,19 @@
             }
         }
     },
-    "#title_label": {
+    "#the": {
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 32
+        }
+    },
+    "#boring": {
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 52
+        }
+    },
+    "#game": {
         "font": {
             "name": "Pixelify Sans",
             "size": 32

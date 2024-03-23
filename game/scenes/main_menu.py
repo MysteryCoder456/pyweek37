@@ -22,12 +22,26 @@ class MainMenuScene(Scene):
             str(theme_path),
         )
 
-        self.title_label = UILabel(
-            relative_rect=pygame.Rect(0, 100, WINDOW_SIZE.x, 100),
-            text="The Boring Game",
+        self.title_label_the = UILabel(
+            relative_rect=pygame.Rect(-57, 80, 100, 50),
+            text="THE",
             manager=self.ui,
             anchors={"centerx": "centerx", "top": "top"},
-            object_id="#title_label",
+            object_id="#the",
+        )
+        self.title_label_boring = UILabel(
+            relative_rect=pygame.Rect(0, 100, 180, 80),
+            text="BORING",
+            manager=self.ui,
+            anchors={"centerx": "centerx", "top": "top"},
+            object_id="#boring",
+        )
+        self.title_label_game = UILabel(
+            relative_rect=pygame.Rect(45, 150, 100, 50),
+            text="GAME",
+            manager=self.ui,
+            anchors={"centerx": "centerx", "top": "top"},
+            object_id="#game",
         )
 
         btn_width, btn_height = 100, 60
@@ -68,6 +82,6 @@ class MainMenuScene(Scene):
         self.ui.update(dt)
 
     def on_draw(self, window: pygame.Surface) -> None:
-        window.fill((50, 50, 100))
+        window.fill("#edf2f4")
         self.ui.draw_ui(window)
         pygame.display.flip()

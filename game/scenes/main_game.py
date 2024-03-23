@@ -319,7 +319,7 @@ class MainGameScene(Scene):
             self.yt_views = max(0, self.yt_views)
 
     def on_draw(self, window: pygame.Surface) -> None:
-        window.fill((50, 50, 100))
+        window.fill("#edf2f4")
 
         for road in self.roads:
             road.draw(window)
@@ -338,7 +338,7 @@ class MainGameScene(Scene):
 
         # Draw view count
         view_text, view_rect = self.font.render(
-            f"{int(self.yt_views)} views", "white", size=24
+            f"{int(self.yt_views)} views", "#1B1B1E", size=24
         )
         window.blit(
             view_text,
@@ -349,7 +349,7 @@ class MainGameScene(Scene):
         # Draw best view count
         if high_score := self.high_score:
             high_score_text, _ = self.font.render(
-                f"Best: {high_score} views", "white", size=24
+                f"Best: {high_score} views", "#1B1B1E", size=24
             )
             window.blit(
                 high_score_text,
