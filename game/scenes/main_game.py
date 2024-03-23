@@ -299,6 +299,9 @@ class MainGameScene(Scene):
             pygame.time.set_timer(self.hide_tube_tip_event, 0)
 
         elif event.type == self.game_over_event:
+            # Stop bg music
+            self.bgm_channel.stop()
+
             # Update high score
             self.high_score = max(int(self.yt_views), self.high_score or 0)
             with open(self.high_score_path, "w") as f:
