@@ -13,7 +13,7 @@ class SteamPipe(Sprite):
 
         frame_width, frame_height = 64, 32
         frame_count = 4
-        scale_factor = 2.5
+        scale_factor = 2.6
 
         self.image = pygame.image.load(STEAM_PIPE_SPRITESHEET_PATH)
         self.frames = [

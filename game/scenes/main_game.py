@@ -220,11 +220,16 @@ class MainGameScene(Scene):
         self.distance_travelled += self.camera_speed * dt
 
         # Spawn pipe at regular distance intervals
-        distance_interval = (
-            300
-            if self.distance_travelled < self.road1.rect.height * 10  # type: ignore
-            else 500
-        )
+
+        road_height = self.road1.rect.height  # type: ignore
+
+        if self.distance_travelled > road_height * 50:
+            distance_interval = 500
+        elif road_height * 10 < self.distance_travelled < road_height * 50:
+            distance_interval = 400
+        else:
+            distance_interval = 250
+
         if (
             self.distance_travelled % distance_interval
             < self.camera_speed * dt
