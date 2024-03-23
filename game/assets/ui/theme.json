@@ -2,6 +2,10 @@
     "defaults": {
         "colours": {
             "normal_text": "#1B1B1E"
+        },
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 22
         }
     },
     "button": {
@@ -13,7 +17,7 @@
         },
         "font": {
             "name": "Pixelify Sans",
-            "size": 20,
+            "size": 22,
             "regular_resource": {
                 "package": "game.assets.ui",
                 "resource": "PixelifySans.ttf"
@@ -48,6 +52,12 @@
         "font": {
             "name": "Pixelify Sans",
             "size": 32
+        }
+    },
+    "@tips": {
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 24
         }
     }
 }

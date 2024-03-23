@@ -9,6 +9,10 @@ from pygame.transform import scale_by
 from pygame.event import custom_type
 from pygame.mixer import Sound, Channel
 
+from pygame_gui import UIManager
+from pygame_gui.elements import UILabel
+from pygame_gui.ui_manager import ObjectID
+
 from game.game_state import GameState
 from game.constants import (
     ASSETS_ROOT_DIR,
@@ -32,6 +36,12 @@ from game.test_tube import TestTube
 class MainGameScene(Scene):
     def on_enter(self) -> None:
         # Initialize assets
+
+        theme_path = ASSETS_ROOT_DIR / "ui" / "theme.json"
+        self.ui = UIManager(
+            (int(WINDOW_SIZE.x), int(WINDOW_SIZE.y)),
+            str(theme_path),
+        )
 
         font_path = ASSETS_ROOT_DIR / "ui" / "PixelifySans.ttf"
         self.font = Font(font_path)
@@ -99,6 +109,97 @@ class MainGameScene(Scene):
         self.tubes: Group[TestTube] = Group()  # type: ignore
         self.hearts: Group[Heart] = Group()  # type: ignore
 
+        self.instructions_1 = UILabel(
+            relative_rect=pygame.Rect(50, -40, 200, 40),
+            text="W - Accelerate",
+            manager=self.ui,
+            anchors={"centery": "centery", "left": "left"},
+            object_id=ObjectID("#instructions_1", class_id="@tips"),
+        )
+        self.instructions_2 = UILabel(
+            relative_rect=pygame.Rect(50, 0, 200, 40),
+            text="S - Decelerate",
+            manager=self.ui,
+            anchors={"centery": "centery", "left": "left"},
+            object_id=ObjectID("#instructions_1", class_id="@tips"),
+        )
+        self.instructions_3 = UILabel(
+            relative_rect=pygame.Rect(50, 40, 200, 40),
+            text="A and D - Steer",
+            manager=self.ui,
+            anchors={"centery": "centery", "left": "left"},
+            object_id=ObjectID("#instructions_1", class_id="@tips"),
+        )
+
+        self.pipe_tip = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                0,
+                300,
+                40,
+            ),
+            text="Avoid the steam pipes!",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.pipe_tip.hide()
+        self.pipe_tip_shown = False
+
+        self.tube_tip_1 = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                -45,
+                300,
+                40,
+            ),
+            text="Acid test tubes give",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.tube_tip_2 = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                -15,
+                300,
+                40,
+            ),
+            text="your views a boost",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.tube_tip_3 = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                15,
+                300,
+                40,
+            ),
+            text="in exchange for a",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.tube_tip_4 = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                45,
+                300,
+                40,
+            ),
+            text="copyright strike.",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.tube_tip_1.hide()
+        self.tube_tip_2.hide()
+        self.tube_tip_3.hide()
+        self.tube_tip_4.hide()
+        self.tube_tip_shown = False
+
         # Game events
 
         self.view_gain_event = custom_type()
@@ -116,6 +217,14 @@ class MainGameScene(Scene):
         pygame.time.set_timer(
             self.begin_tube_spawning_event, 90 * 1000
         )  # Begin spawning tubes after 90s
+
+        self.hide_instructions_event = custom_type()
+        pygame.time.set_timer(
+            self.hide_instructions_event, 20 * 1000
+        )  # 20s interval
+
+        self.hide_pipe_tip_event = custom_type()
+        self.hide_tube_tip_event = custom_type()
 
         self.game_over_event = custom_type()
 
@@ -166,6 +275,23 @@ class MainGameScene(Scene):
             # Cancel begin tube spawning event
             pygame.time.set_timer(self.begin_tube_spawning_event, 0)
 
+        elif event.type == self.hide_instructions_event:
+            self.instructions_1.hide()
+            self.instructions_2.hide()
+            self.instructions_3.hide()
+            pygame.time.set_timer(self.hide_instructions_event, 0)
+
+        elif event.type == self.hide_pipe_tip_event:
+            self.pipe_tip.hide()
+            pygame.time.set_timer(self.hide_pipe_tip_event, 0)
+
+        elif event.type == self.hide_tube_tip_event:
+            self.tube_tip_1.hide()
+            self.tube_tip_2.hide()
+            self.tube_tip_3.hide()
+            self.tube_tip_4.hide()
+            pygame.time.set_timer(self.hide_tube_tip_event, 0)
+
         elif event.type == self.game_over_event:
             # Update high score
             self.high_score = max(int(self.yt_views), self.high_score or 0)
@@ -192,6 +318,8 @@ class MainGameScene(Scene):
                 and self.car_sfx_channel.get_sound() == self.accelerate_sfx
             ):
                 self.car_sfx_channel.stop()
+
+        self.ui.process_events(event)
 
     def on_update(self, dt: float) -> None:
         if self.game_over:
@@ -237,6 +365,7 @@ class MainGameScene(Scene):
             pygame.event.post(Event(self.pipe_spawn_event))
 
         # Update
+        self.ui.update(dt)
         self.car.update(dt, self.camera_speed)
         self.roads.update(dt, self.camera_speed)
         self.pipes.update(dt, self.camera_speed)
@@ -267,6 +396,13 @@ class MainGameScene(Scene):
                 self.pipes.remove(pipe)
                 self.obstacle_sfx_channel.play(self.pipe_hit_sfx)
 
+                if not self.pipe_tip_shown:
+                    self.pipe_tip.show()
+                    self.pipe_tip_shown = True
+                    pygame.time.set_timer(
+                        self.hide_pipe_tip_event, 5 * 1000
+                    )  # 5s interval
+
                 # Check for game over
                 if self.health <= 0:
                     self.game_over = True
@@ -284,6 +420,16 @@ class MainGameScene(Scene):
                 self.health -= 1
                 self.tubes.remove(tube)
                 self.obstacle_sfx_channel.play(self.tube_hit_sfx)
+
+                if not self.tube_tip_shown:
+                    self.tube_tip_1.show()
+                    self.tube_tip_2.show()
+                    self.tube_tip_3.show()
+                    self.tube_tip_4.show()
+                    self.tube_tip_shown = True
+                    pygame.time.set_timer(
+                        self.hide_tube_tip_event, 8 * 1000
+                    )  # 8s interval
 
                 # Check for game over
                 if self.health <= 0:
@@ -382,5 +528,7 @@ class MainGameScene(Scene):
                 ),
                 special_flags=BLEND_ALPHA_SDL2,
             )
+
+        self.ui.draw_ui(window)
 
         pygame.display.flip()
