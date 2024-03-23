@@ -33,7 +33,7 @@ class MainGameScene(Scene):
     def on_enter(self) -> None:
         # Initialize assets
 
-        font_path = ASSETS_ROOT_DIR / "fonts" / "MPLUS1Code.ttf"
+        font_path = ASSETS_ROOT_DIR / "ui" / "PixelifySans.ttf"
         self.font = Font(font_path)
 
         heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"

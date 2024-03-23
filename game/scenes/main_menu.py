@@ -16,26 +16,34 @@ from game.scene import Scene
 
 class MainMenuScene(Scene):
     def on_enter(self) -> None:
-        self.ui = UIManager((int(WINDOW_SIZE.x), int(WINDOW_SIZE.y)))
-
-        font_path = ASSETS_ROOT_DIR / "fonts" / "MPLUS1Code.ttf"
-        self.font = Font(font_path)
+        theme_path = ASSETS_ROOT_DIR / "ui" / "theme.json"
+        self.ui = UIManager(
+            (int(WINDOW_SIZE.x), int(WINDOW_SIZE.y)),
+            str(theme_path),
+        )
 
         self.title_label = UILabel(
-            relative_rect=pygame.Rect(0, 100, 200, 60),
+            relative_rect=pygame.Rect(0, 100, WINDOW_SIZE.x, 100),
             text="The Boring Game",
             manager=self.ui,
             anchors={"centerx": "centerx", "top": "top"},
+            object_id="#title_label",
         )
 
+        btn_width, btn_height = 100, 60
+        gap = 30
         self.play_btn = UIButton(
-            relative_rect=pygame.Rect(0, -40, 80, 50),
+            relative_rect=pygame.Rect(
+                0, -(gap + btn_height) / 2, btn_width, btn_height
+            ),
             text="Play",
             manager=self.ui,
             anchors={"center": "center"},
         )
         self.quit_btn = UIButton(
-            relative_rect=pygame.Rect(0, 40, 80, 50),
+            relative_rect=pygame.Rect(
+                0, (gap + btn_height) / 2, btn_width, btn_height
+            ),
             text="Quit",
             manager=self.ui,
             anchors={"center": "center"},

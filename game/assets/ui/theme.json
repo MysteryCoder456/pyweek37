@@ -1,0 +1,30 @@
+{
+    "button": {
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 20,
+            "regular_resource": {
+                "package": "game.assets.ui",
+                "resource": "PixelifySans.ttf"
+            },
+            "bold_resource": {
+                "package": "game.assets.ui",
+                "resource": "PixelifySans.ttf"
+            },
+            "italic_resource": {
+                "package": "game.assets.ui",
+                "resource": "PixelifySans.ttf"
+            },
+            "bold_italic_resource": {
+                "package": "game.assets.ui",
+                "resource": "PixelifySans.ttf"
+            }
+        }
+    },
+    "#title_label": {
+        "font": {
+            "name": "Pixelify Sans",
+            "size": 32
+        }
+    }
+}
