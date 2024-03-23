@@ -17,7 +17,7 @@ My entry for the PyWeek 37 gamejam.
 A certain billionaire who owns a certain social media site named after an
 alphabet has built certain tunnels to overcome surface road traffic problems.
 However, in an attempt to expose that these tunnels are nothing but hype, you
-embark on a dangerous journey to demonstrate the "utility" of these tunnel
+embark on a dangerous journey to demonstrate the "utility" of these tunnels
 live on YouTube :O
 
 Avoid the leaky steam pipes left by the tunnel engineers, and test tubes left
