@@ -53,7 +53,7 @@ class MainGameScene(Scene):
         self.font = Font(font_path)
 
         heart_sprite_path = ASSETS_ROOT_DIR / "heart" / "heart.png"
-        self.heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 2.5)
+        self.heart_sprite = scale_by(pygame.image.load(heart_sprite_path), 4)
 
         accelerate_sfx_path = ASSETS_ROOT_DIR / "car" / "accelerate.wav"
         self.accelerate_sfx = Sound(accelerate_sfx_path)
@@ -137,19 +137,32 @@ class MainGameScene(Scene):
             object_id=ObjectID("#instructions_1", class_id="@tips"),
         )
 
-        self.pipe_tip = UILabel(
+        self.pipe_tip_1 = UILabel(
             relative_rect=pygame.Rect(
                 self.road1.rect.width / 2 + 145,  # type: ignore
-                0,
+                -15,
                 300,
                 40,
             ),
-            text="Avoid the steam pipes!",
+            text="Avoid the pipes to",
             manager=self.ui,
             anchors={"center": "center"},
             object_id=ObjectID("#pipe_tip", class_id="@tips"),
         )
-        self.pipe_tip.hide()
+        self.pipe_tip_2 = UILabel(
+            relative_rect=pygame.Rect(
+                self.road1.rect.width / 2 + 145,  # type: ignore
+                15,
+                300,
+                40,
+            ),
+            text="avoid copyright strikes!",
+            manager=self.ui,
+            anchors={"center": "center"},
+            object_id=ObjectID("#pipe_tip", class_id="@tips"),
+        )
+        self.pipe_tip_1.hide()
+        self.pipe_tip_2.hide()
         self.pipe_tip_shown = False
 
         self.tube_tip_1 = UILabel(
@@ -288,7 +301,8 @@ class MainGameScene(Scene):
             pygame.time.set_timer(self.hide_instructions_event, 0)
 
         elif event.type == self.hide_pipe_tip_event:
-            self.pipe_tip.hide()
+            self.pipe_tip_1.hide()
+            self.pipe_tip_2.show()
             pygame.time.set_timer(self.hide_pipe_tip_event, 0)
 
         elif event.type == self.hide_tube_tip_event:
@@ -406,7 +420,8 @@ class MainGameScene(Scene):
                 self.obstacle_sfx_channel.play(self.pipe_hit_sfx)
 
                 if not self.pipe_tip_shown:
-                    self.pipe_tip.show()
+                    self.pipe_tip_1.show()
+                    self.pipe_tip_2.show()
                     self.pipe_tip_shown = True
                     pygame.time.set_timer(
                         self.hide_pipe_tip_event, 5 * 1000
@@ -518,8 +533,8 @@ class MainGameScene(Scene):
                 self.heart_sprite,
                 (
                     WINDOW_SIZE.x
-                    - 5
-                    - (1.15 * i + 1) * self.heart_sprite.get_width(),
+                    - 10
+                    - (1.1 * i + 1) * self.heart_sprite.get_width(),
                     5,
                 ),
             )

@@ -11,7 +11,7 @@ class Heart(Sprite):
     def __init__(self, *groups: Group) -> None:
         super().__init__(*groups)
 
-        scale_factor = 2.5
+        scale_factor = 4
 
         self.image = scale_by(
             pygame.image.load(HEART_SPRITE_PATH), scale_factor
