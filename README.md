@@ -21,4 +21,5 @@ embark on a dangerous journey to demonstrate the "utility" of these tunnels
 live on YouTube :O
 
 Avoid the leaky steam pipes left by the tunnel engineers, and test tubes left
-from the billionaire's endless experiments from other companies!
+from the billionaire's endless experiments from other companies! You don't
+want your channel to get a copyright strike, do you?
