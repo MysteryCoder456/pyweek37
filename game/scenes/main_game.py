@@ -302,7 +302,7 @@ class MainGameScene(Scene):
 
         elif event.type == self.hide_pipe_tip_event:
             self.pipe_tip_1.hide()
-            self.pipe_tip_2.show()
+            self.pipe_tip_2.hide()
             pygame.time.set_timer(self.hide_pipe_tip_event, 0)
 
         elif event.type == self.hide_tube_tip_event:
